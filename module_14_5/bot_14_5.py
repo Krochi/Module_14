@@ -53,31 +53,25 @@ from crud_functions import initiate_db, populate_initial_products, get_all_produ
 from keyboard import create_bot_keyboard, create_inline_product_keyboard, create_inline_price_keyboard
 
 
-# Инициализация бота и диспетчера
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
 
-# Инициализация базы данных
 initiate_db()
 populate_initial_products()
 
-# Создание клавиатур
 bot_kb = create_bot_keyboard()
 inline_kb_products = create_inline_product_keyboard()
 
-# Состояния пользователя
 class UserState(StatesGroup):
     age = State()
     growth = State()
     weight = State()
 
-# Состояния регистрации
 class RegistrationState(StatesGroup):
     username = State()
     email = State()
     age = State()
 
-# Команда /start
 @dp.message_handler(commands=['start'])
 async def start_message(message: types.Message):
     await message.answer("Привет! Я бот, помогающий твоему здоровью.", reply_markup=bot_kb)
@@ -115,11 +109,10 @@ async def set_age(message: types.Message, state: FSMContext):
     username = data['username']
     email = data['email']
 
-    add_user(username, email, age)  # добавляем пользователя в базу
+    add_user(username, email, age)  
     await message.answer("Регистрация успешна!")
     await state.finish()
 
-# Обработчик кнопки "Рассчитать"
 @dp.message_handler(text="Рассчитать")
 async def calculate_calories(message: types.Message):
     await message.answer("Введите свой возраст:")
@@ -131,7 +124,6 @@ async def get_buying_list(message: types.Message):
     for product in products:
         product_id, title, description, price = product
         try:
-            # Используем `product_id` для получения правильного изображения
             await message.answer_photo(
                 open(f"product{product_id}.jpg", "rb"),
                 caption=f'Название: {title} | Описание: {description} | Цена: {price} руб.'
@@ -141,20 +133,16 @@ async def get_buying_list(message: types.Message):
 
     await message.answer("Выберите продукт для покупки:", reply_markup=inline_kb_products)
 
-
-# Обработчик выбора продукта
 @dp.callback_query_handler(lambda call: call.data.startswith("product_"))
 async def select_product(call: types.CallbackQuery):
     product_id = call.data.split("_")[1]
     inline_kb_prices = create_inline_price_keyboard(product_id)
     await call.message.answer(f"Цена для Product{product_id}:", reply_markup=inline_kb_prices)
 
-# Обработчик завершения покупки
 @dp.callback_query_handler(lambda call: call.data.startswith("price_"))
 async def send_confirm_message(call: types.CallbackQuery):
     await call.message.answer("Вы успешно приобрели продукт!")
 
-# Обработчик состояния для расчета калорий
 @dp.callback_query_handler(lambda call: call.data == 'calories')
 async def set_age(call: types.CallbackQuery):
     await call.message.answer('Введите свой возраст:')
@@ -184,7 +172,6 @@ async def send_calories(message: types.Message, state: FSMContext):
     await message.answer(f'Ваша норма калорий: {form:.2f} ккал/день')
     await state.finish()
 
-# Обработчик кнопки "Регистрация"
 @dp.message_handler(text="Регистрация")
 async def sing_up(message: types.Message):
     await message.answer("Введите имя пользователя (только латинские алфавит):")
