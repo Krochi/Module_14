@@ -21,10 +21,10 @@ def populate_initial_products():
 
     if count == 0:
         products = [
-            ("Product1", "Описание продукта 1", 1000),
-            ("Product2", "Описание продукта 2", 1200),
-            ("Product3", "Описание продукта 3", 900),
-            ("Product4", "Описание продукта 4", 1700)
+            ("Product1", "Описание продукта 1", 100),
+            ("Product2", "Описание продукта 2", 200),
+            ("Product3", "Описание продукта 3", 300),
+            ("Product4", "Описание продукта 4", 400)
         ]
         cursor.executemany("INSERT INTO Products (title, description, price) VALUES (?, ?, ?)", products)
         connection.commit()
